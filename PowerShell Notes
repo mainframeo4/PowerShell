@@ -1,0 +1,214 @@
+# Largest 3 files in C:\Users\:
+Clear-Host; Get-ChildItem C:\Users\ -Recurse | Sort-Object -Property Length -Descending | Select-Object -First 3
+
+# 5 processes that uses most memory:
+Clear-Host; Get-Process | Sort-Object -Unique NPM -Descending | Select-Object -First 5
+
+# Count running processes:
+Clear-Host; Get-Process | Group-Object Count
+
+Get-Service | Get-Member
+
+Array: [string[]]
+
+#arrays
+$values=['Tyler','Tyler2']
+
+#hashtables
+$values=@{
+    Name='Tyler','Tyler2'
+    Class='PowerShell'
+    ZipCode=92058,92123
+}
+
+#Restrict
+[int]$values='Tyler' #(bad value)
+[int]$values='92058' #(good value)
+
+$values=@{
+    List1=1,2,3,4,5
+    List2=5,4,3,2,1
+}
+
+Remove-Variable values
+
+<# Function #>
+function Add-Thing {
+	[CmdletBinding()]
+	<#
+		[CmdletBinding(SupportsShouldProcess)]
+		if($PSCmdlet.ShouldProcess($thing)){
+			Write-Host "Stopped $thing"
+		} # Could technically perform an Else, but would look interesting
+ 	#>
+	Param([int]$a,[int]$b,[switch]$c)
+	if($c){
+		Write-Verbose "$a - $b =" <# Add -Verbose to force this switch on this string #>
+		Return $a-$b
+	} else {
+	        Write-Verbose "$a + $b ="
+		Return $a+$b
+	}
+}
+<# Filter #>
+Filter Get-Pipeline1{
+	Write-Host "Got a $_"
+}
+
+Write-Warning -WarningAction SilentlyContinue
+Write-Debug "Text"
+Write-Error <# Must format a try and catch #>
+
+<# Hidden-Function #>
+function Add-Thing {
+	Param($a)
+	Return $a+$b
+}
+<# Nested Variable in a Module #>
+$Nested_Variable
+<# Export Module #>
+Export-ModuleMember -Function $Verb_Noun  <# or $*Variable* #> -Variable $Nested_Variable
+<# Module Manifest in a Module #>
+New-ModuleManifest
+
+
+Get-Help Set-StrictMode -Version Latest
+
+Difference between:
+	Get-Help about_for
+	Get-Help about_foreach
+	Get-Help ForEach-Object
+
+Get-Help Out-*
+
+Get-Module
+	PSReadline\get-psreadlinekeyhandler
+
+$env:PSModulePath -split ';'; Write-Host;
+ #Import-Module $verb-noun will import from PSModule without -FilePath
+ #Modules will self-import.
+ #Import-Module $verb-noun -force # This will force an import
+
+Get-Module | Select-Object -Property *
+Find-Module $Module-Name | Install-Module
+Uninstall-Module $Module-Name
+
+<# Limited Error Output: #>
+$error[0]
+<# Large Error Output: #>
+$error[0] | Select-Object *
+
+Clear-Host; try {
+	$x=Get-CimInstance -Class Win32_Service -ComputerName NoSuchLaptop1,TYLER-BIB-LAP,NoSuchLaptop2 <# $Stop-OnError: -ErrorAction Stop #> -ErrorVariable Problems -ErrorAction SilentlyContinue
+} catch {
+ write-host "Error: $_"
+}
+$x
+$Problems
+$error[0]
+
+<# WMI is a Run and Leave Command, Example, Radius/Tactus #>
+Get-WmiObject -Class *serial* -List
+Get-WmiObject -Class Win32_Service | Select *
+Get-WmiObject -Class Win32_Service | Format-Table
+<# Cim is a Start Session, then Continue, Example, Tactus -SingleSession #>
+Get-CimInstance -Class Win32_Service
+Get-CimClass
+
+$x=Get-CimInstance -ClassName Win32_Logicaldisk -Filter "DeviceID='C:'" |
+    Select-Object -Property DeviceID,Size,FreeSpace
+
+$y=Get-CimInstance -ClassName Win32_Share
+
+$z=Get-CimInstance -ClassName Win32_ComputerSystem |
+    Select -Property NumberOfProcessors,NumberOfLogicalProcessors,TotalPhysicalMemory
+Clear-Host; $x|format-table;$y|format-table;$z|format-table
+
+### Can't get this to work: ###
+Get-CimInstance -ClassName Win32_ComputerSystem | 
+	Select-Object -Property @{Name='TotalPhysicalMemoryInGB';Expression={[Math]::Round($_.TotalPhysicalMemory/1GB,2)}}
+
+#Sample Line: Select-Object -Property @{Name='InGB';Expression={[Math]::Round($_.$Object/1G,2)}}
+
+Enable-PSRemoting
+Enter-PSSession [hostname]
+Exit-PSSession
+
+
+Adv-Function
+[Begin Block - Setup Variables]
+[Process Block - Filter, Execute Ever Item on the Pipeline,Only Ran Once]
+[End Block - Cleaning Up, Sorts and Outputs]
+
+Function Adv-Function{
+Begin {}
+Process {}
+End {}
+}
+
+function Get-ComputerInfo {
+	[CmdletBinding()]
+	Param([Parameter(ValueFromPipeline)][string[]]$host_names)
+	process {
+		foreach($comp in $host_names){
+			Get-CimInstance -ClassName Win32_ComputerSystem -ComputerName $comp | 
+				Select -Property Name,NumberOfProcessors,NumberOfLogicalProcessors,@{Name='TotalPhysicalMemoryInGB';Expression={[Math]::Round($_.TotalPhysicalMemory/1GB,2)}}
+			}
+		}
+	}
+
+
+
+function test-test {
+[cmdletbinding(PositionalBinding=$false)]
+Param(
+	[Parameter(Mandatory,Position=0)]
+	[ValidateLength(1,2)]
+	[string]$aba,
+	$b,$c,$d
+	)
+Write-Host $aba
+}
+
+
+New-Object -Com $Com_Automation
+
+[Ordered]@{
+
+
+
+
+
+
+
+function Get-ComputerInfo {
+	[CmdletBinding()]
+	Param([Parameter(ValueFromPipeline)][string[]]$host_names)
+	process {
+		foreach($comp in $host_names){
+$os=Get-CimInstance -ComputerName $comp -Class Win32_OperatingSystem | Select-Object -Property Version
+$cmp=Get-CimInstance -ComputerName $comp -Class Win32_ComputerSystem | Select-Object -Property NumberOfProcessors,NumberOfLogicalProcessors,@{Name='TotalPhysicalMemoryInGB';Expression={[Math]::Round($_.TotalPhysicalMemory/1GB,2)}}
+
+$ip=Get-CimInstance -ComputerName $comp -Class Win32_NetworkAdapterConfiguration | Where-Object -Property IPConnectionMetric -GT 0 | Sort-Object -Property IPConnectionMetric -Descending | Select-Object -First 1
+
+#$ip=Get-CimInstance -ComputerName $comp -Class Win32_NetworkAdapterConfiguration | Where-Object -Property FullDNSRegistrationEnabled -EQ $True
+
+#$ip=Get-CimInstance -Class Win32_NetworkAdapterConfiguration | Where-Object -Property Description -EQ (Get-CimInstance -ComputerName $comp Where-Object -Property Speed -GT 3MB | Where-Object -Property Speed -LT 9223372036854775807).Description
+
+$drives=Get-CimInstance -ComputerName $comp -Class Win32_LogicalDisk -Filter "DeviceID='C:'" | Select-Object -Property DeviceID,@{Name='SizeInGb';Expression={[Math]::Round($_.Size/1GB,2)}}
+
+[PSCustomObject]@{
+	Name=$comp
+	Memory=$cmp.TotalPhysicalMemoryInGB
+	Procs=$cmp.NumberOfProcessors
+	Cores=$cmp.NumberOfLogicalPRocessors
+	IP=$ip.IPAddress
+	Drives=$drives
+	}
+
+			}
+		}
+	}
+
+$MetaData = New-Object System.Management.Automation.CommandMetaData (Get-Command Select-Object)
+[System.Management.Automation.ProxyCommand]::Create($MetaData)
