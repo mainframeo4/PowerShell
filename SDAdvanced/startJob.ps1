@@ -1,0 +1,1 @@
+﻿start-job -ScriptBlock {dir; start-sleep -seconds 10 ;dir}
