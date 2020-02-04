@@ -1,1 +1,2 @@
 https://powershellstation.com/
+https://docs.microsoft.com/en-us/windows/win32/winrm/portal
