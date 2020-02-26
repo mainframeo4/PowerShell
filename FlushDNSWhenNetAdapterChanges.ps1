@@ -11,7 +11,7 @@
 function Check-NetIndex {
     # This is specifically looking for domain registered Networks, you can compare all network objects by removing the Where-Object reference.
     $a=Get-CimInstance -ComputerName localhost -Class Win32_NetworkAdapterConfiguration | Where-Object -Property FullDNSRegistrationEnabled -EQ $True
-    # This is a while loop, with an if/else command block. Due if and else will never return false, making this an indefinite loop.
+    # This is a while loop, with an if/else command block. Due to if and else never returning false, this an indefinite loop.
     While ($true) {
         Start-Sleep -Seconds 10
         # This is specifically looking for domain registered Networks, you can compare all network objects by removing the Where-Object reference.
